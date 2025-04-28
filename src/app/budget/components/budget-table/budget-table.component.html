@@ -1,0 +1,229 @@
+<div class="overflow-x-auto">
+  <table class="table-fixed w-full border border-gray-300 border-collapse">
+    <thead class="bg-gray-200 sticky top-0 z-10">
+      <tr>
+        <th class="px-4 py-2 border-r text-left">Category</th>
+        <th *ngFor="let m of store.months(); let i = index; trackBy: trackByIndex"
+        class="px-4 py-2 border-r text-center whitespace-nowrap">
+      <input
+        type="month"
+        [ngModel]="m"
+        (ngModelChange)="store.updateMonth(i, $event)"
+        class="w-full bg-transparent text-sm text-center
+               focus:outline-none focus:ring-2 focus:ring-blue-400"
+      />
+    </th>
+        <th class="px-4 py-2"></th>
+      </tr>
+    </thead>
+    <tbody class="odd:bg-white even:bg-gray-50">
+
+      <!-- ======= INCOME GROUP ======= -->
+      <tr>
+        <td [attr.colspan]="store.months().length + 2"
+            class="px-4 py-2 border font-bold">
+          Income
+        </td>
+      </tr>
+      <ng-container *ngFor="let pc of store.groups()[0].children; trackBy: trackByParent">
+        <!-- Editable ParentCategory Header -->
+        <tr>
+          <td [attr.colspan]="store.months().length + 2" class="px-4 py-2 border pl-4">
+            <div class="flex items-center">
+              <input
+                [(ngModel)]="pc.name"
+                (ngModelChange)="store.updateParentCategoryName(store.groups()[0].id, pc.id, $event)"
+                placeholder="Parent Category"
+                class="flex-1 bg-transparent font-semibold focus:outline-none focus:ring-2 focus:ring-blue-400"
+              />
+              <button class="ml-2 text-red-500 hover:text-red-700"
+                      (click)="store.removeParentCategory(store.groups()[0].id, pc.id)">
+                ×
+              </button>
+            </div>
+          </td>
+        </tr>
+        <!-- Child Categories -->
+        <tr *ngFor="let c of pc.children; trackBy: trackByCategory" class="hover:bg-gray-50">
+          <td class="px-4 py-2 border pl-8">
+            <input
+              [(ngModel)]="c.name"
+              (ngModelChange)="store.updateCategoryName(store.groups()[0].id, pc.id, c.id, $event)"
+              placeholder="Category"
+              class="w-full bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-400"
+            />
+          </td>
+          <td *ngFor="let m of store.months()" class="px-4 py-2 border"
+          [ngClass]="{
+            'bg-gray-600 opacity-75 cursor-not-allowed': !m
+          }"
+          >
+            <input
+              type="number"
+              [disabled]="!m"
+              [(ngModel)]="c.values[m]"
+              (ngModelChange)="store.updateCategoryValue(store.groups()[0].id, pc.id, c.id, m, $any($event))"
+              class="w-full text-right focus:outline-none focus:ring-2 focus:ring-blue-400"
+            />
+          </td>
+          <td class="px-4 py-2 border text-center">
+            <button class="text-red-500"
+                    (click)="store.removeCategory(store.groups()[0].id, pc.id, c.id)">
+              ×
+            </button>
+          </td>
+        </tr>
+        <!-- Add Category -->
+        <tr class="cursor-pointer hover:bg-gray-50">
+          <td [attr.colspan]="store.months().length + 2"
+              class="px-4 py-2 border italic text-gray-600 pl-8"
+              (click)="store.addCategory(store.groups()[0].id, pc.id)">
+            + Add a new ‘{{ pc.name || "Category" }}’ Category
+          </td>
+        </tr>
+        <!-- Sub Totals -->
+        <tr>
+          <td class="px-4 py-2 border font-semibold">Sub Totals</td>
+          <td *ngFor="let m of store.months()"
+              class="px-4 py-2 border font-semibold text-right">
+            {{ calc.sumParentCategory(pc, m) }}
+          </td>
+          <td class="px-4 py-2 border"></td>
+        </tr>
+      </ng-container>
+      <!-- Add ParentCategory under Income -->
+      <tr class="cursor-pointer hover:bg-gray-50">
+        <td [attr.colspan]="store.months().length + 2"
+            class="px-4 py-2 border italic text-gray-600 pl-4"
+            (click)="store.addParentCategory(store.groups()[0].id)">
+          + Add New Parent Category
+        </td>
+      </tr>
+      <!-- Income Total -->
+      <tr class="font-bold bg-gray-200">
+        <td class="px-4 py-2 border">Income Total</td>
+        <td *ngFor="let m of store.months()" class="px-4 py-2 border text-right">
+          {{ calc.sumGroup(store.groups()[0], m) }}
+        </td>
+        <td class="px-4 py-2 border"></td>
+      </tr>
+
+      <!-- ======= EXPENSES GROUP ======= -->
+      <tr class="h-4"><td [attr.colspan]="store.months().length + 2"></td></tr>
+      <tr>
+        <td [attr.colspan]="store.months().length + 2"
+            class="px-4 py-2 border font-bold">
+          Expenses
+        </td>
+      </tr>
+      <ng-container *ngFor="let pc of store.groups()[1].children; trackBy: trackByParent">
+        <!-- Editable ParentCategory Header -->
+        <tr>
+          <td [attr.colspan]="store.months().length + 2" class="px-4 py-2 border pl-4">
+            <div class="flex items-center">
+              <input
+                [(ngModel)]="pc.name"
+                (ngModelChange)="store.updateParentCategoryName(store.groups()[1].id, pc.id, $event)"
+                placeholder="Parent Category"
+                class="flex-1 bg-transparent font-semibold focus:outline-none focus:ring-2 focus:ring-blue-400"
+              />
+              <button class="ml-2 text-red-500 hover:text-red-700"
+                      (click)="store.removeParentCategory(store.groups()[1].id, pc.id)">
+                ×
+              </button>
+            </div>
+          </td>
+        </tr>
+        <!-- Child Categories -->
+        <tr *ngFor="let c of pc.children; trackBy: trackByCategory" class="hover:bg-gray-50">
+          <td class="px-4 py-2 border pl-8">
+            <input
+              [(ngModel)]="c.name"
+              (ngModelChange)="store.updateCategoryName(store.groups()[1].id, pc.id, c.id, $event)"
+              placeholder="Category"
+              class="w-full bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-400"
+            />
+          </td>
+          <td *ngFor="let m of store.months()" class="px-4 py-2 border"
+          [ngClass]="{
+            'bg-gray-100 opacity-75 cursor-not-allowed': !m
+          }"
+          >
+            <input
+              type="number"
+              [(ngModel)]="c.values[m]"
+              (ngModelChange)="store.updateCategoryValue(store.groups()[1].id, pc.id, c.id, m, $any($event))"
+              class="w-full text-right focus:outline-none focus:ring-2 focus:ring-blue-400"
+            />
+          </td>
+          <td class="px-4 py-2 border text-center">
+            <button class="text-red-500"
+                    (click)="store.removeCategory(store.groups()[1].id, pc.id, c.id)">
+              ×
+            </button>
+          </td>
+        </tr>
+        <!-- Add Category under Expenses -->
+        <tr class="cursor-pointer hover:bg-gray-50">
+          <td [attr.colspan]="store.months().length + 2"
+              class="px-4 py-2 border italic text-gray-600 pl-8"
+              (click)="store.addCategory(store.groups()[1].id, pc.id)">
+            + Add a new ‘{{ pc.name || "Category" }}’ Category
+          </td>
+        </tr>
+        <!-- Sub Totals -->
+        <tr>
+          <td class="px-4 py-2 border font-semibold">Sub Totals</td>
+          <td *ngFor="let m of store.months()"
+              class="px-4 py-2 border font-semibold text-right">
+            {{ calc.sumParentCategory(pc, m) }}
+          </td>
+          <td class="px-4 py-2 border"></td>
+        </tr>
+      </ng-container>
+      <!-- Add ParentCategory under Expenses -->
+      <tr class="cursor-pointer hover:bg-gray-50">
+        <td [attr.colspan]="store.months().length + 2"
+            class="px-4 py-2 border italic text-gray-600 pl-4"
+            (click)="store.addParentCategory(store.groups()[1].id)">
+          + Add New Parent Category
+        </td>
+      </tr>
+      <!-- Expenses Total -->
+      <tr class="font-bold bg-gray-200">
+        <td class="px-4 py-2 border">Expenses Total</td>
+        <td *ngFor="let m of store.months()" class="px-4 py-2 border text-right">
+          {{ calc.sumGroup(store.groups()[1], m) }}
+        </td>
+        <td class="px-4 py-2 border"></td>
+      </tr>
+
+      <!-- GLOBAL TOTALS -->
+      <tr class="font-bold bg-gray-100">
+        <td class="px-4 py-2 border">Profit / Loss</td>
+        <td *ngFor="let m of store.months()" class="px-4 py-2 border text-right">
+          {{ calc.profitLoss([store.groups()[0]], [store.groups()[1]], m) }}
+        </td>
+        <td class="px-4 py-2 border"></td>
+      </tr>
+       <!-- **Replaced** Opening Balance -->
+      <tr class="font-bold bg-gray-50">
+        <td class="px-4 py-2 border">Opening Balance</td>
+        <td *ngFor="let ob of openingBalances" class="px-4 py-2 border text-right">
+          {{ ob }}
+        </td>
+        <td class="px-4 py-2 border"></td>
+      </tr>
+
+      <!-- **Replaced** Closing Balance -->
+      <tr class="font-bold bg-gray-50">
+        <td class="px-4 py-2 border">Closing Balance</td>
+        <td *ngFor="let cb of closingBalances" class="px-4 py-2 border text-right">
+          {{ cb }}
+        </td>
+        <td class="px-4 py-2 border"></td>
+      </tr>
+    </tbody>
+  </table>
+  <app-context-menu></app-context-menu>
+</div>

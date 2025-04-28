@@ -1,0 +1,20 @@
+
+<tr>
+    <td class="p-2 border">{{ category.name || 'New Category' }}</td>
+    <td
+      *ngFor="let m of months"
+      class="p-1 border"
+    >
+      <input
+        type="number"
+        [ngModel]="category.values[m] || 0"
+        (ngModelChange)="change(m, $any($event))"
+        (contextmenu)="ctx.open($event, m, category.values[m] || 0)"
+        class="w-full p-1"
+      />
+    </td>
+    <td class="p-2 border text-red-500 cursor-pointer"
+        (click)="store.removeCategory(parentId, category.id)">
+      &times;
+    </td>
+  </tr>

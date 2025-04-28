@@ -1,0 +1,36 @@
+
+    <!-- Parent header -->
+    <tr class="bg-gray-200 font-semibold">
+        <td class="p-2 border" [attr.colspan]="months.length + 2">
+          {{ group.name }}
+          <span class="text-red-500 float-right cursor-pointer"
+                (click)="store.removeParent(group.id)">
+            &times;
+          </span>
+        </td>
+      </tr>
+  
+      <!-- Existing categories -->
+      <ng-container *ngFor="let c of group.children">
+        <app-category-row
+          [parentId]="group.id"
+          [category]="c"
+          [months]="months"
+        ></app-category-row>
+      </ng-container>
+  
+      <!-- Add new category -->
+      <tr class="cursor-pointer hover:bg-gray-50"
+          (click)="store.addCategory(group.id)">
+        <td class="p-2 border italic text-gray-600" [attr.colspan]="months.length + 2">
+          + Add a new “{{ group.name }}” Category
+        </td>
+      </tr>
+  
+      <!-- Subtotals for this group -->
+      <app-totals-row
+        label="Sub Totals"
+        [groups]="[group]"
+        [months]="months"
+      ></app-totals-row>
+    

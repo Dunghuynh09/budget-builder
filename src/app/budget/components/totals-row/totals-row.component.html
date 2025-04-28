@@ -1,0 +1,8 @@
+
+<tr class="font-bold bg-gray-100">
+    <td class="p-2 border">{{ label }}</td>
+    <td *ngFor="let m of months" class="p-2 border">
+      {{ calc.sumAll(groups, m) }}
+    </td>
+    <td class="p-2 border"></td>
+  </tr>

@@ -1,0 +1,21 @@
+
+<div class="flex gap-4 mb-4">
+    <label>
+      Start:
+      <input
+        type="month"
+        [ngModel]="toInput(store.dateRange().start)"
+        (ngModelChange)="updateStart($event)"
+        class="border p-1"
+      />
+    </label>
+    <label>
+      End:
+      <input
+        type="month"
+        [ngModel]="toInput(store.dateRange().end)"
+        (ngModelChange)="updateEnd($event)"
+        class="border p-1"
+      />
+    </label>
+  </div>

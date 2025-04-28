@@ -1,0 +1,11 @@
+
+<div
+*ngIf="ctx.menuState().open"
+class="absolute bg-white border shadow-lg p-2"
+[style.top.px]="ctx.menuState().y"
+[style.left.px]="ctx.menuState().x"
+>
+<button (click)="ctx.applyToAll()" class="px-2 py-1 hover:bg-gray-100">
+  Apply to all
+</button>
+</div>
