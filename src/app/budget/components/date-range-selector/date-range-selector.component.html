@@ -1,21 +1,21 @@
+<div class="flex space-x-4 p-4 bg-white border-b border-gray-200">
+      <label class="flex items-center space-x-2">
+        <span>Start:</span>
+        <input
+          type="month"
+          [ngModel]="store.start()"
+          (ngModelChange)="onRangeChange($event, store.end())"
+          class="border px-2 py-1 rounded"
+        />
+      </label>
 
-<div class="flex gap-4 mb-4">
-    <label>
-      Start:
-      <input
-        type="month"
-        [ngModel]="toInput(store.dateRange().start)"
-        (ngModelChange)="updateStart($event)"
-        class="border p-1"
-      />
-    </label>
-    <label>
-      End:
-      <input
-        type="month"
-        [ngModel]="toInput(store.dateRange().end)"
-        (ngModelChange)="updateEnd($event)"
-        class="border p-1"
-      />
-    </label>
-  </div>
+      <label class="flex items-center space-x-2">
+        <span>End:</span>
+        <input
+          type="month"
+          [ngModel]="store.end()"
+          (ngModelChange)="onRangeChange(store.start(), $event)"
+          class="border px-2 py-1 rounded"
+        />
+      </label>
+    </div>

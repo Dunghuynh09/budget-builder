@@ -4,23 +4,35 @@ import { v4 as uuid }  from 'uuid';
 
 @Injectable({ providedIn: 'root' })
 export class BudgetStoreService {
-  months = signal<string[]>(['']);
+  // -- range selectors, default Jan–Dec 2024 --
+  start = signal<string>('2024-01');
+  end   = signal<string>('2024-12');
 
-  updateMonth(index: number, newName: string) {
-    this.months.update(ms => {
-      const copy = [...ms];
-      copy[index] = newName;
-      if (index === ms.length - 1 && newName) {
-        copy.push('');
-      }
-      return copy;
-    });
-  }
+
+  months = computed(() => {
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    const [ys, ms] = this.start().split('-').map(Number);
+    const [ye, me] = this.end().split('-').map(Number);
+
+    const out: string[] = [];
+    let y = ys, m = ms;
+    while (y < ye || (y === ye && m <= me)) {
+      out.push(`${y}-${pad(m)}`);
+      m++;
+      if (m > 12) { m = 1; y++; }
+    }
+    return out;
+  });
 
   groups = signal<ParentGroup[]>([
     { id: uuid(), name: 'Income',   children: [] },
     { id: uuid(), name: 'Expenses', children: [] }
   ]);
+  
+  updateRange(newStart: string, newEnd: string) {
+    this.start.set(newStart);
+    this.end.set(newEnd);
+  }
 
   addParentCategory(groupId: string, name = '') {
     this.groups.update(gs =>
@@ -143,12 +155,49 @@ export class BudgetStoreService {
         ...g,
         children: g.children.map(pc => ({
           ...pc,
-          children: pc.children.map(c => ({
-            ...c,
-            values: { ...c.values, [monthKey]: value }
+          children: pc.children.map(cat => ({
+            ...cat,
+            values: { ...cat.values, [monthKey]: value }
           }))
         }))
       }))
     );
+  }
+
+  getValue(groupId: string, parentId: string, catId: string, monthKey: string): number {
+    const g = this.groups().find(g => g.id === groupId)!;
+    const p = g.children.find(p => p.id === parentId)!;
+    const c = p.children.find(c => c.id === catId)!;
+    return c.values[monthKey] || 0;
+  }
+  fillCategoryAcrossMonths(
+      groupId: string,
+      parentId: string,
+      catId: string,
+      value: number
+  ) {
+    this.groups.update(gs => {
+      return gs.map(g => {
+        if (g.id !== groupId) return g;
+        return {
+          ...g,
+          children: g.children.map(p => {
+            if (p.id !== parentId) return p;
+            return {
+              ...p,
+              children: p.children.map(c => {
+                if (c.id !== catId) return c;
+                // apply to every month key
+                const newVals = { ...c.values };
+                for (const m of this.months()) {
+                  newVals[m] = value;
+                }
+                return { ...c, values: newVals };
+              })
+            };
+          })
+        };
+      });
+    });
   }
 }
